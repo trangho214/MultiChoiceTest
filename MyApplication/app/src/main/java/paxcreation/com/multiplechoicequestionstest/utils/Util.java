@@ -7,23 +7,19 @@ import android.widget.RadioGroup;
 
 import java.util.List;
 
+import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.entity.MultiChoiceQuestion;
 
 /**
  * Created by Administrator on 16/06/2015.
  */
 public class Util {
-    public static RadioGroup createMultiChoiceView(Context context, MultiChoiceQuestion currentQuestion )
+   private static Candidate candidate;
+    public Candidate getInstance()
     {
-        RadioGroup radioGroup = new RadioGroup(context);
-        radioGroup.setOrientation(RadioGroup.VERTICAL);
-        for(int i =0; i<currentQuestion.getPossibleAnswers().size(); i++)
-        {
-            RadioButton radioButton = new RadioButton(context);
-            radioButton.setText(currentQuestion.getPossibleAnswers().get(i));
-            radioGroup.addView(radioButton);
-        }
-        return radioGroup;
+        if(candidate == null)
+            candidate = new Candidate();
+        return candidate;
     }
 
 }

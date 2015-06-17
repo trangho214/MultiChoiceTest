@@ -14,6 +14,7 @@ import android.widget.Spinner;
 
 import paxcreation.com.multiplechoicequestionstest.R;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
+import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         spSubjectMain = (Spinner)findViewById( R.id.spSubject_Main );
         spRoleMain = (Spinner)findViewById( R.id.spRole_Main );
         btnOkMain = (Button)findViewById( R.id.btnOk_Main );
-        candidate = Candidate.getInstance();
+        candidate = GlobalObject.getCandidateInstance();
 
         subjectAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.subjects));
         spSubjectMain.setAdapter(subjectAdapter);

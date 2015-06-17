@@ -13,17 +13,15 @@ import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 /**
  * Created by Administrator on 16/06/2015.
  */
-public class StartActivity extends Activity implements View.OnClickListener {
+public class StartActivity extends Activity  {
     private Button btnStart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start);
-        btnStart = (Button)findViewById(R.id.btnStart);
-        btnStart.setOnClickListener(this);
+
     }
 
-    @Override
     public void onClick(View v) {
         Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);

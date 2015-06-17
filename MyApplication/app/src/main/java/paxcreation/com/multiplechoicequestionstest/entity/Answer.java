@@ -8,6 +8,10 @@ public class Answer {
     private int multiChoiceAnswer;
     private String constructedAnswer;
 
+    public Answer(int questionId){
+        multiChoiceAnswer = -1;
+        constructedAnswer = "DEFAULT";
+    }
     public Answer(int questionId, int multiChoiceAnswer, String constructedAnswer) {
         this.questionId = questionId;
         this.multiChoiceAnswer = multiChoiceAnswer;
