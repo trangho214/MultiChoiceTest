@@ -1,0 +1,11 @@
+<resources>
+    <string-array name="subjects">
+        <item>@string/android</item>
+        <item>@string/ios</item>
+    </string-array>
+
+    <string-array name="role">
+        <item>@string/dev</item>
+        <item>@string/admin</item>
+    </string-array>
+</resources>
