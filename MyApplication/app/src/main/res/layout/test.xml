@@ -12,6 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right">
+
             <TextView
                 android:text="@string/time"
                 android:layout_marginRight="10dp"
@@ -20,7 +21,6 @@
 
             <TextView
                 android:id="@+id/txtTime"
-                android:text="12:20"
                 android:layout_marginRight="20dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

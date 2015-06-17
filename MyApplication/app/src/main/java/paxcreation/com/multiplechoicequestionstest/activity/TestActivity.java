@@ -2,6 +2,7 @@ package paxcreation.com.multiplechoicequestionstest.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
@@ -31,12 +32,13 @@ import paxcreation.com.multiplechoicequestionstest.utils.Data;
  */
 public class TestActivity extends Activity implements ViewPagerListener{
 
-    ViewPager vp;
-    MultiChoiceAdapter adapter;
-    Candidate candidate;
+    private ViewPager vp;
+    private MultiChoiceAdapter adapter;
+    private TextView txtTimer;
 
-    List<Answer> answers;
-    int currentPosition=0;
+    private Candidate candidate;
+    private  List<Answer> answers;
+    private int currentPosition=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
 
     private void init()
     {
+        txtTimer = (TextView)findViewById(R.id.txtTime);
         answers = new ArrayList<Answer>();
         candidate = GlobalObject.getCandidateInstance();
         vp = (ViewPager)findViewById(R.id.vpQuestion_Test);
@@ -64,9 +67,26 @@ public class TestActivity extends Activity implements ViewPagerListener{
         vp.setAdapter(adapter);
         vp.setOnPageChangeListener(onPageChangeListener);
         candidate.setAnswers(answers);
+        startCountdown(10*60*1000);
     }
 
+        private void startCountdown(int timeInMilliseconds)
+        {
+            ( new CountDownTimer(timeInMilliseconds,1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    long durationSeconds = millisUntilFinished/1000;
+                    txtTimer.setText(String.format("%02d:%02d", (durationSeconds % 3600) / 60, (durationSeconds % 60)));
+                }
 
+                @Override
+                public void onFinish() {
+
+                }
+            }).start();
+        }
+//   set viewpager to OnPageChangeListener to get the current position when sliding
+//   and currentPosition will be used to next and previous button
     ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -75,7 +95,6 @@ public class TestActivity extends Activity implements ViewPagerListener{
         @Override
         public void onPageSelected(int position) {
             currentPosition = position;
-
         }
 
         @Override
