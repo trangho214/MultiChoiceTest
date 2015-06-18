@@ -4,30 +4,24 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.KeyListener;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 import paxcreation.com.multiplechoicequestionstest.R;
-import paxcreation.com.multiplechoicequestionstest.entity.Answer;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.entity.ConstructedQuestion;
 import paxcreation.com.multiplechoicequestionstest.entity.MultiChoiceQuestion;
 import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
-import paxcreation.com.multiplechoicequestionstest.utils.Util;
 
 /**
  * Created by Administrator on 16/06/2015.
@@ -54,19 +48,21 @@ public class MultiChoiceAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
 
-        final View view = inflater.inflate(R.layout.multichoice_element, container, false);
+        final View view = inflater.inflate(R.layout.question_element, container, false);
         LinearLayout llo = (LinearLayout)view.findViewById(R.id.llo_MultiChoiceElement);
 
         TextView txtQuestion = (TextView)view.findViewById(R.id.txtQuestion_MultiChoiceElement);
         TextView txtContent = (TextView)view.findViewById(R.id.txtContent_MultiChoiceElement);
         EditText editText = (EditText)view.findViewById(R.id.edAnswer_MultiChoiceElement);
+        LinearLayout lloGroupView =(LinearLayout)view.findViewById(R.id.lloGroupView_MultiChoiceElement);
         if(position< getMultiChoiceCount())
         {
             MultiChoiceQuestion currentQuestion = multiChoiceQuestions.get(position);
             editText.setVisibility(View.GONE);
             txtQuestion.setText(currentQuestion.getQuestion());
             txtContent.setText(currentQuestion.getContent());
-            llo.addView(createMultiChoiceView(context, currentQuestion, position));
+            lloGroupView.addView(createMultiChoiceView(context, currentQuestion, position));
+//            llo.addView(createMultiChoiceView(context, currentQuestion, position));
         }
         else
         {

@@ -1,5 +1,6 @@
 package paxcreation.com.multiplechoicequestionstest.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -7,13 +8,16 @@ import java.util.List;
  * Created by Administrator on 12/06/2015.
  */
 
-public class Candidate {
-    private static Candidate instance = null;
+public class Candidate implements Serializable{
+    public static final String TAG ="candidate";
+    private static final long SERIAL_VERSION_UID = -7406082437623008161L;
 
-    private int id;
+    private long id;
     private String name;
     private boolean isAndroidDev;
+    private long create_at;
     private List<Answer> answers;
+
 
     public Candidate(int id, String name, List<Answer> answers) {
         this.id = id;
@@ -23,19 +27,11 @@ public class Candidate {
 
     public Candidate(){}
 
-    public static Candidate getInstance()
-    {
-        if(instance == null)
-        {
-            instance = new Candidate();
-        }
-        return instance;
-    }
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -61,5 +57,13 @@ public class Candidate {
 
     public void setIsAndroidDev(boolean isAndroidDev) {
         this.isAndroidDev = isAndroidDev;
+    }
+
+    public long getCreate_at() {
+        return create_at;
+    }
+
+    public void setCreate_at(long create_at) {
+        this.create_at = create_at;
     }
 }

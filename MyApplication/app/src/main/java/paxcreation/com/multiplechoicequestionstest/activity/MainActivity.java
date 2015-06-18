@@ -1,8 +1,10 @@
 package paxcreation.com.multiplechoicequestionstest.activity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.BoringLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import paxcreation.com.multiplechoicequestionstest.R;
+import paxcreation.com.multiplechoicequestionstest.database.CandidateDAO;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
 
@@ -60,19 +63,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        candidate.setName(edNameMain.getText().toString());
+        String name =edNameMain.getText().toString();
+        candidate.setName(name);
         subject = spSubjectMain.getSelectedItem().toString();
+        boolean isAndroidDev = (subject.equals(getString(R.string.android)))? true:false;
         role = spRoleMain.getSelectedItem().toString();
-        if(subject.equals(getResources().getString(R.string.android)))
-            candidate.setIsAndroidDev(true);
-        else candidate.setIsAndroidDev(false);
+        candidate.setIsAndroidDev(isAndroidDev);
 
         if ( v == btnOkMain ) {
-           if (role.equals(getString(R.string.dev)))
-           {
-               Intent intent = new Intent(MainActivity.this, StartActivity.class);
-               startActivity(intent);
-           }
+            if (role.equals(getString(R.string.dev)))
+            {
+                asyncTask.execute(candidate);
+                Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                startActivity(intent);
+            }
         }
     }
 
@@ -97,5 +101,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return super.onOptionsItemSelected(item);
     }
+
+    AsyncTask<Candidate, Void, Boolean> asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
+
+        @Override
+        protected Boolean doInBackground(Candidate... params) {
+
+            CandidateDAO candidateDAO = CandidateDAO.getInstance(MainActivity.this.getApplicationContext());
+
+            candidateDAO.open();
+
+            long id = candidateDAO.insertCandidate(candidate.getName(), candidate.isAndroidDev(), System.currentTimeMillis());
+            if(id != -1) {
+                candidate.setId(id);
+                candidateDAO.close();
+                return true;
+            }
+            candidateDAO.close();
+            return false;
+        }
+    };
 
 }

@@ -51,6 +51,7 @@
                 android:src="@drawable/ic_navigation_arrow_forward"
                 android:layout_alignParentRight="true"
                 android:onClick="onClick"/>
+
             <ImageButton
                 android:id="@+id/ibtnPrevious_Test"
                 android:layout_width="wrap_content"
@@ -58,6 +59,16 @@
                 android:src="@drawable/ic_navigation_arrow_back"
                 android:layout_alignParentLeft="true"
                 android:onClick="onClick"/>
+            <Button
+                android:id="@+id/btnFinish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/ibtnPrevious_Test"
+                android:layout_toLeftOf="@+id/ibtmNext_Test"
+                android:layout_alignBottom="@+id/ibtnPrevious_Test"
+                android:layout_alignTop="@+id/ibtnPrevious_Test"
+                android:onClick="onClick"
+                android:text="@string/finish"/>
         </RelativeLayout>
 
     </LinearLayout>

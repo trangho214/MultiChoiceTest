@@ -12,7 +12,6 @@
     <string name="Answer">Answer</string>
     <string name="sum">Sum</string>
     <string name="total">Total</string>
-    <string name="finish">Finish</string>
     <string name="Next">Previous</string>
     <string name="ok">Ok</string>
     <string name="time_up">Time\'s up</string>
@@ -23,6 +22,7 @@
     <string name="dev">Candidate</string>
     <string name="android">Android:</string>
     <string name="ios">IOS:</string>
+    <string name="finish">Finish</string>
     <string name="lorum">"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."</string>
 
 

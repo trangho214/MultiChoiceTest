@@ -5,6 +5,7 @@ package paxcreation.com.multiplechoicequestionstest.entity;
  */
 public class Question {
     private int id;
+    private int questionType_id;
     private String question;
     private String content;
 
