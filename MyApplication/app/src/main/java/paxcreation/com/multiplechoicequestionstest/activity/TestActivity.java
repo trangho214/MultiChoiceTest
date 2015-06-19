@@ -1,20 +1,14 @@
 package paxcreation.com.multiplechoicequestionstest.activity;
 
 import android.app.Activity;
-import android.database.Cursor;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewParent;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +22,6 @@ import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.entity.ConstructedQuestion;
 import paxcreation.com.multiplechoicequestionstest.entity.MultiChoiceQuestion;
 import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
-import paxcreation.com.multiplechoicequestionstest.manager.DatabaseManager;
 import paxcreation.com.multiplechoicequestionstest.utils.Data;
 
 /**
@@ -44,6 +37,8 @@ public class TestActivity extends Activity implements ViewPagerListener{
     private  List<Answer> answers;
     private int currentPosition=0;
 
+    List<MultiChoiceQuestion> multiChoiceQuestions;
+    List<ConstructedQuestion> constructedQuestions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,18 +50,26 @@ public class TestActivity extends Activity implements ViewPagerListener{
     {
         txtTimer = (TextView)findViewById(R.id.txtTime);
         answers = new ArrayList<Answer>();
-        candidate = GlobalObject.getCandidateInstance();
+        candidate = GlobalObject.getCandidateInstance_Test();
+        Log.d("candidate name", candidate.getName());
+        multiChoiceQuestions = new ArrayList<MultiChoiceQuestion>();
+        constructedQuestions = new ArrayList<ConstructedQuestion>();
         vp = (ViewPager)findViewById(R.id.vpQuestion_Test);
-        if(candidate.isAndroidDev()) {
-            adapter = new MultiChoiceAdapter(this, Data.getMultiChoiceQuestionsAndroid(), Data.getConstructedQuestionAndroid(), this);
+        if(candidate.isAndroidDev()){
+            multiChoiceQuestions = Data.getMultiChoiceQuestionsAndroid();
+            constructedQuestions = Data.getConstructedQuestionAndroid();
         }
         else {
-            adapter = new MultiChoiceAdapter(this, Data.getMultiChoiceQuestionIOS(), Data.getConstructedQuestionIOS(), this);
+            multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
+            constructedQuestions = Data.getConstructedQuestionIOS();
         }
+        adapter = new MultiChoiceAdapter(this,multiChoiceQuestions, constructedQuestions, this);
+
         for(int i =0; i<adapter.getCount(); i++)
         {
             answers.add(new Answer(i));
         }
+
         vp.setAdapter(adapter);
         vp.setOnPageChangeListener(onPageChangeListener);
         candidate.setAnswers(answers);
@@ -84,7 +87,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
 
             @Override
             public void onFinish() {
-
+//                TODO: save answer to database, then stop the test
             }
         }).start();
     }
@@ -125,22 +128,22 @@ public class TestActivity extends Activity implements ViewPagerListener{
                 }
                 break;
             case R.id.btnFinish:
-            {
                 asyncTask.execute(candidate);
-            }
+                break;
         }
     }
 
     AsyncTask<Candidate, Void, Boolean > asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
-        AnswerDAO answerDAO = new AnswerDAO(getApplicationContext());
+        AnswerDAO answerDAO;
         @Override
         protected Boolean doInBackground(Candidate... params) {
             try{
+                answerDAO = AnswerDAO.getInstance(TestActivity.this.getApplicationContext());
                 answerDAO.open();
                 for (int i = 0; i<candidate.getAnswers().size(); i++)
                 {
                     Answer answer = candidate.getAnswers().get(i);
-                    answerDAO.insertAnswer(candidate.getId(),answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer());
+                    answerDAO.insertAnswer(candidate.getId(), answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer(), answer.getPoint());
                 }
                 answerDAO.close();
                 return true;
@@ -155,16 +158,23 @@ public class TestActivity extends Activity implements ViewPagerListener{
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-
         }
     };
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+//        TODO: handle change configuration here.
+    }
+
+    @Override
     public void onRadioClick(int position, int index) {
-
         candidate.getAnswers().get(position).setMultiChoiceAnswer(index);
+        if(multiChoiceQuestions.get(position).getRightAnswer() == index)
+            candidate.getAnswers().get(position).setPoint(1);
+        else
+            candidate.getAnswers().get(position).setPoint(0);
         Log.d("tiateItem click tion", String.valueOf(candidate.getAnswers().get(position).getMultiChoiceAnswer()));
-
     }
 
     @Override

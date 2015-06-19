@@ -1,6 +1,7 @@
 package paxcreation.com.multiplechoicequestionstest.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,7 @@ public class CandidateAdapter extends BaseAdapter {
         Candidate currentCandidate = getItem(position);
         if(rowView == null)
         {
-            rowView = View.inflate(context, R.layout.candidate_element,null);
+            rowView = inflater.inflate(R.layout.candidate_element,null);
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.txtName = (TextView)rowView.findViewById(R.id.txtName_CandidateElement);
             viewHolder.txtCreatedAt= (TextView)rowView.findViewById(R.id.txtCreatedAt_CandidateElement);
@@ -60,6 +61,7 @@ public class CandidateAdapter extends BaseAdapter {
 
         ViewHolder vh =(ViewHolder)rowView.getTag();
         vh.txtName.setText(currentCandidate.getName());
+        Log.d("candidate name", currentCandidate.getName());
         vh.txtCreatedAt.setText(millisecondsToDateTime(currentCandidate.getCreate_at()));
         return rowView;
     }

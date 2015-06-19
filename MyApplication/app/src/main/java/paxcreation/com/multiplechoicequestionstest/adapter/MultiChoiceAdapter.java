@@ -41,7 +41,7 @@ public class MultiChoiceAdapter extends PagerAdapter {
         this.constructedQuestions = constructedQuestions;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.viewPagerListener = viewPagerListener;
-        currentCandidate = GlobalObject.getCandidateInstance();
+        currentCandidate = GlobalObject.getCandidateInstance_Test();
     }
 
 
@@ -53,8 +53,9 @@ public class MultiChoiceAdapter extends PagerAdapter {
 
         TextView txtQuestion = (TextView)view.findViewById(R.id.txtQuestion_MultiChoiceElement);
         TextView txtContent = (TextView)view.findViewById(R.id.txtContent_MultiChoiceElement);
-        EditText editText = (EditText)view.findViewById(R.id.edAnswer_MultiChoiceElement);
+        EditText editText = (EditText)view.findViewById(R.id.edAnswerConstructed_MultiChoiceElement);
         LinearLayout lloGroupView =(LinearLayout)view.findViewById(R.id.lloGroupView_MultiChoiceElement);
+        ((LinearLayout)view.findViewById(R.id.lloResult_MultiChoiceElement)).setVisibility(View.GONE);
         if(position< getMultiChoiceCount())
         {
             MultiChoiceQuestion currentQuestion = multiChoiceQuestions.get(position);

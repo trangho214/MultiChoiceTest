@@ -27,6 +27,16 @@ public class AnswerDAO {
             DBHelper.ANSWER_CONSTRUCTED_ANSWER,
             DBHelper.ANSWER_POINT};
 
+    private static AnswerDAO instance = null;
+
+    public static AnswerDAO getInstance(Context context) {
+        if(instance == null)
+        {
+            instance = new AnswerDAO(context);
+        }
+        return instance;
+    }
+
     public AnswerDAO(Context context)
     {
         dbHelper = new DBHelper(context);

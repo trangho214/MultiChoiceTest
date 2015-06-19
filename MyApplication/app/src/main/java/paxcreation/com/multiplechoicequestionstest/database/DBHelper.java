@@ -32,9 +32,9 @@ public class DBHelper extends SQLiteOpenHelper{
 
 
     //    Columns of answer
-    public static final String TABLE_ANSWER = "candidate";
+    public static final String TABLE_ANSWER = "answer";
     public static final String ANSWER_ID = "answer_id";
-    public static final String ANSWER_C_ID = "company_id";
+    public static final String ANSWER_C_ID = "candidate_id";
     public static final String ANSWER_Q_ID = "question_id";
     public static final String ANSWER_MULTI_ANSWER = "multichoice_answer";
     public static final String ANSWER_CONSTRUCTED_ANSWER = "constructed_answer";
@@ -45,15 +45,15 @@ public class DBHelper extends SQLiteOpenHelper{
     private static final int DATABASE_VERSION = 1;
 
 
-    private static final String SQL_CREATE_TABLE_CANDIDATE = "CREATE TABLE IF NOT EXISTS " + TABLE_CANDIDATE +" ( "
+    private static final String SQL_CREATE_TABLE_CANDIDATE = "CREATE TABLE " + TABLE_CANDIDATE +" ( "
             + CANDIDATE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + CANDIDATE_NAME + " TEXT NOT NULL, "
             + CANDIDATE_ISANDROIDDEV + " INTEGER NOT NULL, "
             + CANDIDATE_CREATE_AT + " INTEGER "
             + ");";
 
-    private static final String SQL_CREATE_TABLE_ANSWER = "CREATE TABLE IF NOT EXISTS "+ TABLE_ANSWER + " ( "
-            + ANSWER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT "
+    private static final String SQL_CREATE_TABLE_ANSWER = "CREATE TABLE "+ TABLE_ANSWER + " ( "
+            + ANSWER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + ANSWER_C_ID + " INTEGER NOT NULL, "
             + ANSWER_Q_ID + " INTEGER NOT NULL, "
             + ANSWER_MULTI_ANSWER + " INTEGER, "

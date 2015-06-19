@@ -18,7 +18,6 @@ public class CandidateDAO {
     public static final String TAG = "CandidateDAO";
     public Context context;
 
-
     private static CandidateDAO instance = null;
 
     public static CandidateDAO getInstance(Context context ) {

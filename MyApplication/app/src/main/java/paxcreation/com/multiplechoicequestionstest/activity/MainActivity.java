@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.BoringLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         spSubjectMain = (Spinner)findViewById( R.id.spSubject_Main );
         spRoleMain = (Spinner)findViewById( R.id.spRole_Main );
         btnOkMain = (Button)findViewById( R.id.btnOk_Main );
-        candidate = GlobalObject.getCandidateInstance();
+        candidate = GlobalObject.getCandidateInstance_Test();
 
         subjectAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.subjects));
         spSubjectMain.setAdapter(subjectAdapter);
@@ -75,6 +73,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             {
                 asyncTask.execute(candidate);
                 Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                startActivity(intent);
+            }
+            else
+            {
+                Intent intent = new Intent(MainActivity.this, AdminActivity.class);
                 startActivity(intent);
             }
         }
@@ -106,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected Boolean doInBackground(Candidate... params) {
-
             CandidateDAO candidateDAO = CandidateDAO.getInstance(MainActivity.this.getApplicationContext());
 
             candidateDAO.open();
