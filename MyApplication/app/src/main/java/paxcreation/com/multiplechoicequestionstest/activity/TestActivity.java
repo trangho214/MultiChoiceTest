@@ -143,6 +143,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
                 for (int i = 0; i<candidate.getAnswers().size(); i++)
                 {
                     Answer answer = candidate.getAnswers().get(i);
+                    Log.d("candidate answer", answer.getConstructedAnswer());
                     answerDAO.insertAnswer(candidate.getId(), answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer(), answer.getPoint());
                 }
                 answerDAO.close();

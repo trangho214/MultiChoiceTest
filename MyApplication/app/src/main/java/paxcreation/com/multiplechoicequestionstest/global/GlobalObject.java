@@ -25,6 +25,7 @@ public class GlobalObject {
         return candidate_admin;
     }
 
+
     private static List<Candidate> candidates;
     public static List<Candidate> getCandidatesInstance()
     {
@@ -32,5 +33,13 @@ public class GlobalObject {
             candidates = new ArrayList<Candidate>();
         return candidates;
     }
+    public static List<Candidate> getCandidates() {
+        return candidates;
+    }
+
+    public static void setCandidates(List<Candidate> candidates) {
+        GlobalObject.candidates = candidates;
+    }
+
 
 }

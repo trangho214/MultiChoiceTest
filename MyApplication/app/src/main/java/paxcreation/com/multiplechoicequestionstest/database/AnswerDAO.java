@@ -21,6 +21,7 @@ public class AnswerDAO {
     private SQLiteDatabase database;
     private DBHelper dbHelper;
     private String[] allColumns = {
+            DBHelper.ANSWER_ID,
             DBHelper.ANSWER_C_ID,
             DBHelper.ANSWER_Q_ID,
             DBHelper.ANSWER_MULTI_ANSWER,
@@ -74,7 +75,7 @@ public class AnswerDAO {
         return (insertId >=0)? true: false;
     }
 
-    public boolean updateAnswer(int answerId,float point)
+    public boolean updateAnswer(long answerId,float point)
     {
         open();
         ContentValues values = new ContentValues();
@@ -107,11 +108,12 @@ public class AnswerDAO {
     private Answer cursorToAnswer(Cursor cursor)
     {
         Answer answer = new Answer();
-        answer.setCandidateId(cursor.getInt(0));
-        answer.setQuestionId(cursor.getInt(1));
-        answer.setMultiChoiceAnswer(cursor.getInt(2));
-        answer.setConstructedAnswer(cursor.getString(3));
-        answer.setPoint(cursor.getFloat(4));
+        answer.setAnswerId(cursor.getInt(0));
+        answer.setCandidateId(cursor.getInt(1));
+        answer.setQuestionId(cursor.getInt(2));
+        answer.setMultiChoiceAnswer(cursor.getInt(3));
+        answer.setConstructedAnswer(cursor.getString(4));
+        answer.setPoint(cursor.getFloat(5));
         return answer;
     }
 

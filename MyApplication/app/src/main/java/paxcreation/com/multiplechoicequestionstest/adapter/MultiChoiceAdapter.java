@@ -78,13 +78,13 @@ public class MultiChoiceAdapter extends PagerAdapter {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    Log.d("Text change",s.toString() +" "+ position );
-                    viewPagerListener.onTextChange(position, s.toString());
+                    Log.d("Text change", s.toString() + " " + position);
+//                    viewPagerListener.onTextChange(position, s.toString());
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-
+                    viewPagerListener.onTextChange(position, s.toString());
                 }
             });
             txtQuestion.setText(currentConstructedQuestion.getQuestion());

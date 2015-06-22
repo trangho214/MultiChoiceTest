@@ -1,20 +1,18 @@
 package paxcreation.com.multiplechoicequestionstest.fragment;
 
 
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import paxcreation.com.multiplechoicequestionstest.R;
@@ -23,7 +21,6 @@ import paxcreation.com.multiplechoicequestionstest.adapter.CandidateAdapter;
 import paxcreation.com.multiplechoicequestionstest.database.CandidateDAO;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
-import paxcreation.com.multiplechoicequestionstest.utils.Data;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -110,6 +107,7 @@ public class CandidateListFragment extends Fragment {
         }
     }
 
+    //configuration/orientation change
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -122,6 +120,7 @@ public class CandidateListFragment extends Fragment {
             CandidateDAO candidateDao = CandidateDAO.getInstance(getActivity());
             candidateDao.open();
             candidates= candidateDao.getAllCandidate();
+            GlobalObject.setCandidates(candidates);
             Log.d("candidate size", String.valueOf(candidates.size()));
             candidateDao.close();
             return candidates;

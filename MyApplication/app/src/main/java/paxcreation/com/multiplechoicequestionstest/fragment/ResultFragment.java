@@ -1,14 +1,16 @@
 package paxcreation.com.multiplechoicequestionstest.fragment;
 
-import android.app.Activity;
-import android.net.Uri;
+import android.app.Fragment;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ public class ResultFragment extends Fragment {
     private static final String INDEX = "index";
 
     private ListView lvResult;
+    private List<Answer> answerList;
 
     private List<MultiChoiceQuestion> multiChoiceQuestions;
     private List<ConstructedQuestion> constructedQuestions;
@@ -54,22 +57,22 @@ public class ResultFragment extends Fragment {
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_result, container, false);
-        index = getArguments().getInt(INDEX);
+        index = getArguments().getInt(INDEX,0);
         init(v);
         return v;
     }
     private void init(View v)
     {
-
+        answerList = new ArrayList<Answer>();
         lvResult = (ListView)v.findViewById(R.id.lvMultiChoice_Result);
-        currentCandidate = GlobalObject.getCandidateInstance_Admin();
+//        currentCandidate = GlobalObject.getCandidateInstance_Admin();
         List<Candidate> candidates = GlobalObject.getCandidatesInstance();
+        Log.d("candidate size result", String.valueOf(candidates.size()) + " index " + index);
         currentCandidate = candidates.get(index);
 
         if(currentCandidate.isAndroidDev())
@@ -82,11 +85,11 @@ public class ResultFragment extends Fragment {
             multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
             constructedQuestions = Data.getConstructedQuestionIOS();
         }
-        asyncTask.execute();
+        getAnswerAsyncTask.execute();
 
     }
 
-    AsyncTask<Void, Void, List<Answer>> asyncTask = new AsyncTask<Void, Void, List<Answer>>() {
+    AsyncTask<Void, Void, List<Answer>> getAnswerAsyncTask = new AsyncTask<Void, Void, List<Answer>>() {
         @Override
         protected List<Answer> doInBackground(Void... params) {
             List<Answer> answers = new ArrayList<Answer>();
@@ -100,15 +103,69 @@ public class ResultFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Answer> answers) {
             super.onPostExecute(answers);
-            adapter = new ResultAdapter(getActivity(),multiChoiceQuestions, constructedQuestions, currentCandidate,answers);
+            answerList = answers;
+            adapter = new ResultAdapter(getActivity(),multiChoiceQuestions, constructedQuestions, currentCandidate,answerList);
             lvResult.setAdapter(adapter);
+            lvResult.addFooterView(footer());
+            txtSum.setText(String.valueOf(getSum(answers)));
         }
     };
 
+    private float getSum(List<Answer> answers)
+    {
+        float sum = 0;
+        for (int i =0; i<answers.size(); i++)
+        {
+            sum = sum + answers.get(i).getPoint();
+        }
+        return sum;
 
+    }
+    private Button btnOk;
+    private TextView txtSum;
+    private TextView txtTotal;
+    private View footer()
+    {
+        View v = ((LayoutInflater)getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.footer_result,null);
+        txtSum = (TextView)v.findViewById(R.id.txtSum_Result);
+        txtTotal = (TextView)v.findViewById(R.id.txtTotal_Result);
+        btnOk = (Button)v.findViewById(R.id.btnOK_Result);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateAsyncTask.execute();
+            }
+        });
+        return v;
+    }
 
+    AsyncTask<Void, Void, Boolean> updateAsyncTask = new AsyncTask<Void, Void, Boolean>() {
+        boolean isUpdated = false;
+        @Override
+        protected Boolean doInBackground(Void... voids) {
 
+            AnswerDAO answerDAO = AnswerDAO.getInstance(getActivity());
+            answerDAO.open();
+            for (int i =answerList.size()-1; i >= answerList.size()-adapter.getConstructedCount();i-- )
+            {
+                isUpdated =   answerDAO.updateAnswer(answerList.get(i).getAnswerId(), answerList.get(i).getPoint());
+                Log.d("candidate async point", " id:  "  + answerList.get(i).getAnswerId() + " point " +  answerList.get(i).getPoint() );
+                Log.d("candidate async point", " is update " +  isUpdated );
+            }
+            answerDAO.close();
+            return isUpdated;
+        }
 
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if(isUpdated)
+            {
+                txtSum.setText(String.valueOf(getSum(answerList)));
+                Log.d("candidate result", String.valueOf(isUpdated));
+            }
+        }
+    };
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -119,6 +176,8 @@ public class ResultFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-
+    public interface UpdateListener{
+        void update(List<Answer> answers);
+    }
 
 }

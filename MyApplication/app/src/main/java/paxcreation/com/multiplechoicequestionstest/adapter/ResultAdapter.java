@@ -1,6 +1,9 @@
 package paxcreation.com.multiplechoicequestionstest.adapter;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +21,6 @@ import paxcreation.com.multiplechoicequestionstest.entity.Answer;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.entity.ConstructedQuestion;
 import paxcreation.com.multiplechoicequestionstest.entity.MultiChoiceQuestion;
-import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
 
 /**
  * Created by Administrator on 18/06/2015.
@@ -27,7 +29,6 @@ public class ResultAdapter extends BaseAdapter {
     String[] answerStrings;
     Context context;
     List<Answer> answers;
-    List<Candidate> candidates;
     Candidate currentCandidate;
     List<MultiChoiceQuestion> multiChoiceQuestions;
     List<ConstructedQuestion> constructedQuestions;
@@ -41,7 +42,6 @@ public class ResultAdapter extends BaseAdapter {
         this.currentCandidate = currentCandidate;
         answerStrings = new String[]{"a", "b","c","d","e","f"};
         currentCandidate.setAnswers(answers);
-        candidates = GlobalObject.getCandidatesInstance();
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -70,6 +70,8 @@ public class ResultAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        final Answer currentAnswer = answers.get(position);
+        Log.d("candidate answer count", "answer count " + answers.size());
         final View view = inflater.inflate(R.layout.question_element, null);
         TextView txtQuestion = (TextView) view.findViewById(R.id.txtQuestion_MultiChoiceElement);
         TextView txtContent = (TextView) view.findViewById(R.id.txtContent_MultiChoiceElement);
@@ -77,26 +79,40 @@ public class ResultAdapter extends BaseAdapter {
         LinearLayout lloRadioGroup = (LinearLayout) view.findViewById(R.id.lloGroupView_MultiChoiceElement);
         TextView txtResult = (TextView) view.findViewById(R.id.txtAnswer_MultiChoiceElement);
         EditText edPoint = (EditText) view.findViewById(R.id.txtPoint_MultiChoiceElement);
-        Answer currentAnswer = answers.get(position);
+        edPoint.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                currentAnswer.setPoint(Float.parseFloat(editable.toString()));
+                Log.d("candidate point update", editable.toString());
+            }
+        });
 
         if (position < getMultiChoiceCount()) {
-            MultiChoiceQuestion currentQuestion = multiChoiceQuestions.get(answers.get(position).getQuestionId());
+            MultiChoiceQuestion currentQuestion = multiChoiceQuestions.get(currentAnswer.getQuestionId());
             txtQuestion.setText(currentQuestion.getQuestion());
             txtContent.setText(currentQuestion.getContent());
             lloRadioGroup.addView(createMultiChoiceView(context, currentQuestion));
             txtResult.setText(answerStrings[currentAnswer.getMultiChoiceAnswer()]);
             edPoint.setText(String.valueOf(currentAnswer.getPoint()));
-
         }
         else {
             ConstructedQuestion currentConstructed = constructedQuestions.get(position-getMultiChoiceCount());
             txtQuestion.setText(currentConstructed.getQuestion());
             txtContent.setText(currentConstructed.getContent());
-            txtResult.setText(currentAnswer.getMultiChoiceAnswer());
-
+            txtResult.setText(currentAnswer.getConstructedAnswer());
+            edPoint.setText(String.valueOf(currentAnswer.getPoint()));
         }
-
-     return view;
+        return view;
     }
 
 
@@ -107,7 +123,9 @@ public class ResultAdapter extends BaseAdapter {
             radioButton.setText(currentQuestion.getPossibleAnswers().get(i));
             radioGroup.addView(radioButton);
         }
-            ((RadioButton) radioGroup.getChildAt(currentQuestion.getRightAnswer())).setChecked(true);
-            return radioGroup;
-        }
+        ((RadioButton) radioGroup.getChildAt(currentQuestion.getRightAnswer())).setChecked(true);
+        return radioGroup;
     }
+
+
+}

@@ -19,7 +19,8 @@
         <activity android:name=".activity.StartActivity"></activity>
         <activity android:name=".activity.TestActivity"></activity>
         <activity android:name=".activity.AdminActivity"></activity>
-        <activity android:name=".activity.ResultActivity"></activity>
+        <activity android:name=".activity.ResultActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>
