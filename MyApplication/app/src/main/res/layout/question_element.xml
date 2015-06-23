@@ -7,6 +7,7 @@
     <LinearLayout android:id="@+id/llo_MultiChoiceElement"
         android:orientation="vertical"
         android:layout_width="match_parent"
+        android:layout_margin="10dp"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/txtQuestion_MultiChoiceElement"
@@ -23,13 +24,15 @@
             android:id="@+id/lloGroupView_MultiChoiceElement"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"></LinearLayout>
 
         <EditText
             android:id="@+id/edAnswerConstructed_MultiChoiceElement"
             android:layout_margin="10dp"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:gravity="top"
             android:background="@drawable/rectangle"
             />
 
@@ -44,11 +47,13 @@
             android:layout_gravity="center_vertical"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
+
         <EditText
             android:id="@+id/txtPoint_MultiChoiceElement"
             android:gravity="right"
             android:background="@drawable/rectangle"
             android:layout_gravity="right"
+            android:layout_marginRight="10dp"
             android:layout_width="60dp"
             android:layout_height="40dp" />
         </LinearLayout>

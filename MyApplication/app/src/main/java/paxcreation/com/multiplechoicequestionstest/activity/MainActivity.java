@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import paxcreation.com.multiplechoicequestionstest.R;
 import paxcreation.com.multiplechoicequestionstest.database.CandidateDAO;
@@ -61,26 +63,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        Toast toast;
         String name =edNameMain.getText().toString();
-        candidate.setName(name);
-        subject = spSubjectMain.getSelectedItem().toString();
-        boolean isAndroidDev = (subject.equals(getString(R.string.android)))? true:false;
-        role = spRoleMain.getSelectedItem().toString();
-        candidate.setIsAndroidDev(isAndroidDev);
-
-        if ( v == btnOkMain ) {
-            if (role.equals(getString(R.string.dev)))
-            {
-                asyncTask.execute(candidate);
-                Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                startActivity(intent);
-            }
-            else
-            {
-                Intent intent = new Intent(MainActivity.this, AdminActivity.class);
-                startActivity(intent);
+        if(isEmpty(name))
+        {
+            toast = Toast.makeText(MainActivity.this, "Please enter name", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER,0,0);
+            toast.show();
+        }
+        else
+        {
+            candidate.setName(name);
+            subject = spSubjectMain.getSelectedItem().toString();
+            boolean isAndroidDev = (subject.equals(getString(R.string.android)))? true:false;
+            role = spRoleMain.getSelectedItem().toString();
+            candidate.setIsAndroidDev(isAndroidDev);
+            if ( v == btnOkMain ) {
+                if (role.equals(getString(R.string.dev)))
+                {
+                    asyncTask.execute(candidate);
+                    Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                    startActivity(intent);
+                }
+                else
+                {
+                    if(name.equals("admin")) {
+                        Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+                        startActivity(intent);
+                    }
+                    else {
+                        toast = Toast.makeText(MainActivity.this, "You are not admin", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER,0,0);
+                        toast.show();
+                    }
+                }
             }
         }
+    }
+
+    private boolean isEmpty(String name)
+    {
+        return (name.equals("")|| name.length()==0);
     }
 
     @Override

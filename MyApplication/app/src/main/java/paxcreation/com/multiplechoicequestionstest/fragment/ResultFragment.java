@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import paxcreation.com.multiplechoicequestionstest.R;
@@ -29,12 +30,15 @@ public class ResultFragment extends Fragment {
     private static final String INDEX = "index";
 
     private ListView lvResult;
+    private TextView txtCandidateName;
     private List<Answer> answerList;
+    private ResultAdapter adapter;
+
 
     private List<MultiChoiceQuestion> multiChoiceQuestions;
     private List<ConstructedQuestion> constructedQuestions;
     private Candidate currentCandidate;
-    private ResultAdapter adapter;
+
 
     private List<Candidate> candidates;
     private int index;
@@ -68,10 +72,13 @@ public class ResultFragment extends Fragment {
     }
     private void init(View v)
     {
+
+        String isAndroid;
         answerList = new ArrayList<Answer>();
         lvResult = (ListView)v.findViewById(R.id.lvMultiChoice_Result);
+        txtCandidateName = (TextView)v.findViewById(R.id.txtCandidateName_Result);
 //        currentCandidate = GlobalObject.getCandidateInstance_Admin();
-        List<Candidate> candidates = GlobalObject.getCandidatesInstance();
+        candidates = GlobalObject.getCandidatesInstance();
         Log.d("candidate size result", String.valueOf(candidates.size()) + " index " + index);
         currentCandidate = candidates.get(index);
 
@@ -79,12 +86,15 @@ public class ResultFragment extends Fragment {
         {
             multiChoiceQuestions = Data.getMultiChoiceQuestionsAndroid();
             constructedQuestions = Data.getConstructedQuestionAndroid();
+            isAndroid = "(Android)";
         }
         else
         {
             multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
             constructedQuestions = Data.getConstructedQuestionIOS();
+            isAndroid = "(IOS)";
         }
+        txtCandidateName.setText("Candidate: " + currentCandidate.getName() + isAndroid);
         getAnswerAsyncTask.execute();
 
     }
@@ -123,12 +133,10 @@ public class ResultFragment extends Fragment {
     }
     private Button btnOk;
     private TextView txtSum;
-    private TextView txtTotal;
     private View footer()
     {
         View v = ((LayoutInflater)getActivity().getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.footer_result,null);
         txtSum = (TextView)v.findViewById(R.id.txtSum_Result);
-        txtTotal = (TextView)v.findViewById(R.id.txtTotal_Result);
         btnOk = (Button)v.findViewById(R.id.btnOK_Result);
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,18 +174,4 @@ public class ResultFragment extends Fragment {
             }
         }
     };
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface UpdateListener{
-        void update(List<Answer> answers);
-    }
-
 }

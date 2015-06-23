@@ -1,5 +1,6 @@
 package paxcreation.com.multiplechoicequestionstest.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -70,6 +71,7 @@ public class ResultAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+//        inflater = (LayoutInflater) ((Activity)context).getLayoutInflater();
         final Answer currentAnswer = answers.get(position);
         Log.d("candidate answer count", "answer count " + answers.size());
         final View view = inflater.inflate(R.layout.question_element, null);
@@ -87,13 +89,13 @@ public class ResultAdapter extends BaseAdapter {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                Log.d("candidate point update",String.valueOf(charSequence.charAt(i)));
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 currentAnswer.setPoint(Float.parseFloat(editable.toString()));
-                Log.d("candidate point update", editable.toString());
+
             }
         });
 
@@ -102,7 +104,10 @@ public class ResultAdapter extends BaseAdapter {
             txtQuestion.setText(currentQuestion.getQuestion());
             txtContent.setText(currentQuestion.getContent());
             lloRadioGroup.addView(createMultiChoiceView(context, currentQuestion));
-            txtResult.setText(answerStrings[currentAnswer.getMultiChoiceAnswer()]);
+            if(currentAnswer.getMultiChoiceAnswer()== -1)
+                txtResult.setText("No answer");
+            else
+                txtResult.setText(answerStrings[currentAnswer.getMultiChoiceAnswer()]);
             edPoint.setText(String.valueOf(currentAnswer.getPoint()));
         }
         else {

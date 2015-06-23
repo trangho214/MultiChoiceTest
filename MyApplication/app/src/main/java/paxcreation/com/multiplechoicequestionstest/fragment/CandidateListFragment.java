@@ -1,6 +1,5 @@
 package paxcreation.com.multiplechoicequestionstest.fragment;
 
-
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -13,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import paxcreation.com.multiplechoicequestionstest.R;
@@ -29,7 +30,7 @@ public class CandidateListFragment extends Fragment {
     private static final String CURRENTCHOICE = "CurrentChoice";
 
     ListView lvCandidate;
-    List<Candidate> candidates;
+    List<Candidate> candidateList;
     CandidateAdapter adapter;
 
     boolean dualPane;
@@ -51,15 +52,15 @@ public class CandidateListFragment extends Fragment {
 
     private void init(View v, Bundle savedInstanceState)
     {
-        candidates = GlobalObject.getCandidatesInstance();
+        candidateList = GlobalObject.getCandidatesInstance();
         lvCandidate = (ListView)v.findViewById(R.id.lvCandidate_CandidateFragment);
-        async.execute();
+//        async.execute();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        FrameLayout can first find onActivityCreated not onCreateView
+//        FrameLayout can first find from onActivityCreated not onCreateView
         View resultFrame =getActivity().findViewById(R.id.frResult);
         dualPane = resultFrame!=null && resultFrame.getVisibility() == View.VISIBLE;
         if(dualPane)
@@ -67,6 +68,7 @@ public class CandidateListFragment extends Fragment {
             lvCandidate.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             showDetails(currentCheckPosition);
         }
+        else async.execute();
         if(savedInstanceState!= null)
         {
             currentCheckPosition = savedInstanceState.getInt(CURRENTCHOICE);
@@ -82,28 +84,36 @@ public class CandidateListFragment extends Fragment {
 
     private void showDetails(int index)
     {
-        currentCheckPosition = index;
-
-        if(dualPane)
-        {
-            lvCandidate.setItemChecked(index, true);
-
-            ResultFragment resultFragment = (ResultFragment)getFragmentManager().findFragmentById(R.id.frResult);
-            if(resultFragment ==null || resultFragment.getShownIndex()!= index)
-            {
-                resultFragment = ResultFragment.newInstance(index);
-
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.frResult, resultFragment);
-                transaction.commit();
-            }
-
-        }
+        if( candidateList.size()== 0)
+            async.execute();
         else
         {
-            Intent intent = new Intent(getActivity(), ResultActivity.class);
-            intent.putExtra("index",index);
-            startActivity(intent);
+            currentCheckPosition = index;
+            if(dualPane)
+            {
+                if(adapter == null || adapter.getCount()==0)
+                {
+                    adapter = new CandidateAdapter(getActivity(),candidateList);
+                }
+                lvCandidate.setAdapter(adapter);
+                lvCandidate.setItemChecked(index, true);
+
+                ResultFragment resultFragment = (ResultFragment)getFragmentManager().findFragmentById(R.id.frResult);
+                if(resultFragment ==null || resultFragment.getShownIndex()!= index)
+                {
+                    resultFragment = ResultFragment.newInstance(index);
+
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                    transaction.replace(R.id.frResult, resultFragment);
+                    transaction.commit();
+                }
+            }
+            else
+            {
+                Intent intent = new Intent(getActivity(), ResultActivity.class);
+                intent.putExtra("index",index);
+                startActivity(intent);
+            }
         }
     }
 
@@ -119,9 +129,8 @@ public class CandidateListFragment extends Fragment {
         protected List<Candidate> doInBackground(Void... params) {
             CandidateDAO candidateDao = CandidateDAO.getInstance(getActivity());
             candidateDao.open();
-            candidates= candidateDao.getAllCandidate();
-            GlobalObject.setCandidates(candidates);
-            Log.d("candidate size", String.valueOf(candidates.size()));
+            List<Candidate> candidates;
+            candidates = candidateDao.getAllCandidate();
             candidateDao.close();
             return candidates;
         }
@@ -129,11 +138,14 @@ public class CandidateListFragment extends Fragment {
         @Override
         protected void onPostExecute(final List<Candidate> candidates) {
             super.onPostExecute(candidates);
-            adapter = new CandidateAdapter(getActivity(),candidates);
+            candidateList = candidates;
+            GlobalObject.setCandidates(candidates);
+            adapter = new CandidateAdapter(getActivity(),candidateList);
+            Log.d("candidate size", String.valueOf(candidates.size()));
             lvCandidate.setAdapter(adapter);
-
+            if(dualPane)
+            showDetails(currentCheckPosition);
 //            TODO: change the current candidate
-
         }
     };
 

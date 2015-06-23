@@ -1,6 +1,9 @@
 package paxcreation.com.multiplechoicequestionstest.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,9 +39,12 @@ public class TestActivity extends Activity implements ViewPagerListener{
     private Candidate candidate;
     private  List<Answer> answers;
     private int currentPosition=0;
+    private boolean isDone = false;
+    private int time;
 
-    List<MultiChoiceQuestion> multiChoiceQuestions;
-    List<ConstructedQuestion> constructedQuestions;
+
+    private List<MultiChoiceQuestion> multiChoiceQuestions;
+    private List<ConstructedQuestion> constructedQuestions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,17 +57,18 @@ public class TestActivity extends Activity implements ViewPagerListener{
         txtTimer = (TextView)findViewById(R.id.txtTime);
         answers = new ArrayList<Answer>();
         candidate = GlobalObject.getCandidateInstance_Test();
-        Log.d("candidate name", candidate.getName());
         multiChoiceQuestions = new ArrayList<MultiChoiceQuestion>();
         constructedQuestions = new ArrayList<ConstructedQuestion>();
         vp = (ViewPager)findViewById(R.id.vpQuestion_Test);
         if(candidate.isAndroidDev()){
             multiChoiceQuestions = Data.getMultiChoiceQuestionsAndroid();
             constructedQuestions = Data.getConstructedQuestionAndroid();
+            time = 20*60*1000;
         }
         else {
             multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
             constructedQuestions = Data.getConstructedQuestionIOS();
+            time = 10*60*1000;
         }
         adapter = new MultiChoiceAdapter(this,multiChoiceQuestions, constructedQuestions, this);
 
@@ -73,7 +80,8 @@ public class TestActivity extends Activity implements ViewPagerListener{
         vp.setAdapter(adapter);
         vp.setOnPageChangeListener(onPageChangeListener);
         candidate.setAnswers(answers);
-        startCountdown(10 * 60 * 1000);
+
+        startCountdown((int) (0.3*60*1000));
     }
 
     private void startCountdown(int timeInMilliseconds)
@@ -84,10 +92,10 @@ public class TestActivity extends Activity implements ViewPagerListener{
                 long durationSeconds = millisUntilFinished/1000;
                 txtTimer.setText(String.format("%02d:%02d", (durationSeconds % 3600) / 60, (durationSeconds % 60)));
             }
-
             @Override
             public void onFinish() {
-//                TODO: save answer to database, then stop the test
+
+                asyncTask.execute(candidate);
             }
         }).start();
     }
@@ -128,15 +136,16 @@ public class TestActivity extends Activity implements ViewPagerListener{
                 }
                 break;
             case R.id.btnFinish:
-                asyncTask.execute(candidate);
+                showConfirmationDialog();
                 break;
         }
     }
 
-    AsyncTask<Candidate, Void, Boolean > asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
+
+    AsyncTask<Candidate, Void, Void > asyncTask = new AsyncTask<Candidate, Void, Void>() {
         AnswerDAO answerDAO;
         @Override
-        protected Boolean doInBackground(Candidate... params) {
+        protected Void doInBackground(Candidate... params) {
             try{
                 answerDAO = AnswerDAO.getInstance(TestActivity.this.getApplicationContext());
                 answerDAO.open();
@@ -147,20 +156,60 @@ public class TestActivity extends Activity implements ViewPagerListener{
                     answerDAO.insertAnswer(candidate.getId(), answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer(), answer.getPoint());
                 }
                 answerDAO.close();
-                return true;
+                return null;
             }
             catch (Exception e)
             {
                 answerDAO.close();
-                return false;
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(Void aBoolean) {
+            if(isDone)
+                showThankDialog("Thank You", "Thank for participating in our test.\n Your answers are saved.", "OK");
+            else
+                showThankDialog("Time's up", "Thank for participating in our test.\n Your answers are saved.", "OK");
         }
     };
+
+
+    private void showConfirmationDialog(){
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Confirmation");
+        alertDialog.setMessage("This action will terminate your test. Are you sure?");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                isDone = true;
+                asyncTask.execute(candidate);
+            }
+        });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
+    }
+
+
+    private void showThankDialog(String title, String message, String positiveConfirm)
+    {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, positiveConfirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(TestActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        alertDialog.show();
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -175,12 +224,10 @@ public class TestActivity extends Activity implements ViewPagerListener{
             candidate.getAnswers().get(position).setPoint(1);
         else
             candidate.getAnswers().get(position).setPoint(0);
-        Log.d("tiateItem click tion", String.valueOf(candidate.getAnswers().get(position).getMultiChoiceAnswer()));
     }
 
     @Override
     public void onTextChange(int position, String text) {
         candidate.getAnswers().get(position).setConstructedAnswer(text);
-        Log.d("tiateItem position", String.valueOf(position));
     }
 }
