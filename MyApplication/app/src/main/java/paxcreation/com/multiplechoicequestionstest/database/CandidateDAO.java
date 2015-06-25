@@ -9,6 +9,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import paxcreation.com.multiplechoicequestionstest.entity.Answer;
 import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 
 /**
@@ -21,6 +22,7 @@ public class CandidateDAO {
     private static CandidateDAO instance = null;
 
     public static CandidateDAO getInstance(Context context ) {
+//        return new CandidateDAO(context);
         if (instance == null){
             instance = new CandidateDAO(context);
         }
@@ -71,20 +73,22 @@ public class CandidateDAO {
 //        return candidate.getId();
     }
 
-    public boolean deleteCandidate(int candidateId)
+    public List<Candidate> deleteCandidate(long candidateId)
     {
-        int rowEffected = database.delete(DBHelper.TABLE_CANDIDATE, DBHelper.CANDIDATE_ID + " = " + candidateId, null);
+        int rowEffectedCandidate = database.delete(DBHelper.TABLE_CANDIDATE, DBHelper.CANDIDATE_ID + " = " + candidateId, null);
+        AnswerDAO answerDAO = AnswerDAO.getInstance(context);
+        int rowEffectAnswer = answerDAO.deleteAnswerByCandidate(candidateId);
 //        should delete answers belong to this candidate too. Can do it by CASCADING or manually
-        Log.d("row effected", String.valueOf(rowEffected));
-        return (rowEffected>0)? true:false;
+        Log.d("row effected", "Candidate " + rowEffectedCandidate + ", Answer" + rowEffectAnswer);
+        return getAllCandidate();
     }
 
     public List<Candidate> getAllCandidate()
     {
-        open();
-        AnswerDAO answerDAO = new AnswerDAO(context);
+        AnswerDAO answerDAO = AnswerDAO.getInstance(context);
+        answerDAO.open();
         List<Candidate> candidates = new ArrayList<Candidate>();
-        Cursor cursor = database.query(DBHelper.TABLE_CANDIDATE, allColumns, null,null,null,null,null);
+        Cursor cursor = database.query(DBHelper.TABLE_CANDIDATE, allColumns, null, null, null, null, DBHelper.CANDIDATE_CREATE_AT + " DESC");
         if(cursor!= null)
         {
             cursor.moveToNext();
@@ -96,10 +100,11 @@ public class CandidateDAO {
                 cursor.moveToNext();
             }
         }
-        cursor.close();
+        answerDAO.close();
         close();
         return candidates;
     }
+
 
 
     private Candidate cursorToCandidate(Cursor cursor)

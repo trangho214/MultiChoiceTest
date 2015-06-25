@@ -1,10 +1,13 @@
 package paxcreation.com.multiplechoicequestionstest.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Size;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,10 +50,7 @@ public class MultiChoiceAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
-
         final View view = inflater.inflate(R.layout.question_element, container, false);
-        LinearLayout llo = (LinearLayout)view.findViewById(R.id.llo_MultiChoiceElement);
-
         TextView txtQuestion = (TextView)view.findViewById(R.id.txtQuestion_MultiChoiceElement);
         TextView txtContent = (TextView)view.findViewById(R.id.txtContent_MultiChoiceElement);
         EditText editText = (EditText)view.findViewById(R.id.edAnswerConstructed_MultiChoiceElement);
@@ -63,7 +63,6 @@ public class MultiChoiceAdapter extends PagerAdapter {
             txtQuestion.setText(currentQuestion.getQuestion());
             txtContent.setText(currentQuestion.getContent());
             lloGroupView.addView(createMultiChoiceView(context, currentQuestion, position));
-//            llo.addView(createMultiChoiceView(context, currentQuestion, position));
         }
         else
         {
@@ -152,8 +151,6 @@ public class MultiChoiceAdapter extends PagerAdapter {
     public boolean isViewFromObject(View view, Object object) {
         return view == ((ScrollView)object);
     }
-
-
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {

@@ -239,7 +239,7 @@ public class Data {
         multiChoiceQuestion1.setPossibleAnswers(Arrays.asList(
                 "A. Yen trả ra giá trị đúng",
                 "B. Khi chạy sẽ ném ra exception",
-                "C. Yen và Euro trả ra giá trị đúng\u2028\n",
+                "C. Yen và Euro trả ra giá trị đúng",
                 "D. Lỗi biên dịch ở Yen",
                 "E. Lỗi biên dịch ở Euro"));
         multiChoiceQuestion1.setRightAnswer(3);

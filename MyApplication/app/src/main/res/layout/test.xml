@@ -26,23 +26,17 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtQuestion_Test"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-
         <android.support.v4.view.ViewPager
             android:scrollbars="vertical"
             android:id="@+id/vpQuestion_Test"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1">
         </android.support.v4.view.ViewPager>
 
 
         <RelativeLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton

@@ -11,12 +11,14 @@
             android:layout_weight="1.5"
             android:layout_width="0dp"
             android:textColor="@android:color/black"
+            style="@style/tv_large"
             android:layout_height="wrap_content"
             android:text="@string/sum"/>
 
         <TextView
             android:id="@+id/txtSum_Result"
             android:textColor="@android:color/black"
+            style="@style/tv_large"
             android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

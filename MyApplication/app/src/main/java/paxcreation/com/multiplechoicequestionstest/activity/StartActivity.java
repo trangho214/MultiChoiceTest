@@ -41,6 +41,11 @@ public class StartActivity extends Activity  {
         txtInfo.setText(info);
     }
 
+    @Override
+    public void onBackPressed() {
+        return;
+    }
+
     public void onClick(View v) {
         Intent intent = new Intent(this, TestActivity.class);
         startActivity(intent);

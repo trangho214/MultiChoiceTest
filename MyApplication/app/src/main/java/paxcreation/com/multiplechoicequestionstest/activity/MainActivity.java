@@ -1,13 +1,13 @@
 package paxcreation.com.multiplechoicequestionstest.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnOkMain;
     private ArrayAdapter<String> subjectAdapter, roleAdapter;
 
-    private String role, subject;
+    private String position, subject;
     private Candidate candidate;
 
     @Override
@@ -45,8 +45,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * (http://www.buzzingandroid.com/tools/android-layout-finder)
      */
     private void findViews() {
-
+        View v = findViewById(R.id.lloMainActivity);
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!(v instanceof EditText))
+                    hideKeyboard();
+            }
+        });
         edNameMain = (EditText)findViewById( R.id.edName_Main );
+
         spSubjectMain = (Spinner)findViewById( R.id.spSubject_Main );
         spRoleMain = (Spinner)findViewById( R.id.spRole_Main );
         btnOkMain = (Button)findViewById( R.id.btnOk_Main );
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Toast toast;
-        String name =edNameMain.getText().toString();
+        String name =edNameMain.getText().toString().trim();
         if(isEmpty(name))
         {
             toast = Toast.makeText(MainActivity.this, "Please enter name", Toast.LENGTH_LONG);
@@ -76,14 +84,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             candidate.setName(name);
             subject = spSubjectMain.getSelectedItem().toString();
             boolean isAndroidDev = (subject.equals(getString(R.string.android)))? true:false;
-            role = spRoleMain.getSelectedItem().toString();
+            position = spRoleMain.getSelectedItem().toString();
             candidate.setIsAndroidDev(isAndroidDev);
             if ( v == btnOkMain ) {
-                if (role.equals(getString(R.string.dev)))
+                if (position.equals(getString(R.string.dev)))
                 {
-                    asyncTask.execute(candidate);
-                    Intent intent = new Intent(MainActivity.this, StartActivity.class);
-                    startActivity(intent);
+                    if(name.toLowerCase().equals("admin"))
+                    {
+                        toast = Toast.makeText(MainActivity.this, "You are not admin", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER,0,0);
+                        toast.show();
+                    }
+                    else
+                    {
+                        addNewCandidate();
+                        Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                        startActivity(intent);
+                    }
                 }
                 else
                 {
@@ -93,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     else {
                         toast = Toast.makeText(MainActivity.this, "You are not admin", Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER,0,0);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
                     }
                 }
@@ -101,41 +118,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(edNameMain.getWindowToken(), 0);
+    }
+
     private boolean isEmpty(String name)
     {
         return (name.equals("")|| name.length()==0);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    AsyncTask<Candidate, Void, Boolean> asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
-
+       private void addNewCandidate (){
+        AsyncTask<Candidate, Void, Boolean> asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
         @Override
         protected Boolean doInBackground(Candidate... params) {
             CandidateDAO candidateDAO = CandidateDAO.getInstance(MainActivity.this.getApplicationContext());
-
             candidateDAO.open();
-
             long id = candidateDAO.insertCandidate(candidate.getName(), candidate.isAndroidDev(), System.currentTimeMillis());
             if(id != -1) {
                 candidate.setId(id);
@@ -146,5 +145,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return false;
         }
     };
-
+        asyncTask.execute();
+    }
 }

@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:orientation="vertical"
+    android:id="@+id/lloMainActivity"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
@@ -37,6 +38,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:text="@string/position"
             android:layout_weight="1"/>
         <Spinner
             android:id="@+id/spSubject_Main"
@@ -53,6 +55,7 @@
         android:weightSum="4">
         <TextView
             android:layout_width="0dp"
+            android:text="@string/role"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
         <Spinner

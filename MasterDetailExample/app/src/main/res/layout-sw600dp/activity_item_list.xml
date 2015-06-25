@@ -4,13 +4,10 @@
     android:layout_marginRight="16dp" android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal" android:orientation="horizontal"
     android:showDividers="middle" tools:context=".ItemListActivity">
-
     <!--
     This layout is a two-pane layout for the Items
     master/detail flow.
-    
-    -->
-
+   -->
     <fragment android:id="@+id/item_list"
         android:name="paxcreation.com.masterdetailexample.ItemListFragment"
         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"

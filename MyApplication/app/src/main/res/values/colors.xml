@@ -1,0 +1,4 @@
+<resources>
+    <color name="blue">@android:color/holo_blue_bright</color>
+    <color name="transparent">@android:color/transparent</color>
+</resources>

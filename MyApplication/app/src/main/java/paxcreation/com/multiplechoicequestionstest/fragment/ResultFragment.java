@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,6 +68,7 @@ public class ResultFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_result, container, false);
         index = getArguments().getInt(INDEX,0);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         init(v);
         return v;
     }
@@ -76,6 +78,7 @@ public class ResultFragment extends Fragment {
         String isAndroid;
         answerList = new ArrayList<Answer>();
         lvResult = (ListView)v.findViewById(R.id.lvMultiChoice_Result);
+        lvResult.setItemsCanFocus(true);
         txtCandidateName = (TextView)v.findViewById(R.id.txtCandidateName_Result);
 //        currentCandidate = GlobalObject.getCandidateInstance_Admin();
         candidates = GlobalObject.getCandidatesInstance();
@@ -95,31 +98,37 @@ public class ResultFragment extends Fragment {
             isAndroid = "(IOS)";
         }
         txtCandidateName.setText("Candidate: " + currentCandidate.getName() + isAndroid);
-        getAnswerAsyncTask.execute();
+        getAnswer();
 
     }
 
-    AsyncTask<Void, Void, List<Answer>> getAnswerAsyncTask = new AsyncTask<Void, Void, List<Answer>>() {
-        @Override
-        protected List<Answer> doInBackground(Void... params) {
-            List<Answer> answers = new ArrayList<Answer>();
-            AnswerDAO answerDAO = AnswerDAO.getInstance(getActivity());
-            answerDAO.open();
-            answers = answerDAO.getAnswersByCID(currentCandidate.getId());
-            answerDAO.close();
-            return answers;
-        }
 
-        @Override
-        protected void onPostExecute(List<Answer> answers) {
-            super.onPostExecute(answers);
-            answerList = answers;
-            adapter = new ResultAdapter(getActivity(),multiChoiceQuestions, constructedQuestions, currentCandidate,answerList);
-            lvResult.setAdapter(adapter);
-            lvResult.addFooterView(footer());
-            txtSum.setText(String.valueOf(getSum(answers)));
-        }
-    };
+    private void getAnswer()
+    {
+        AsyncTask<Void, Void, List<Answer>> getAnswerAsyncTask = new AsyncTask<Void, Void, List<Answer>>() {
+            @Override
+            protected List<Answer> doInBackground(Void... params) {
+                List<Answer> answers;
+                AnswerDAO answerDAO = AnswerDAO.getInstance(getActivity());
+                answerDAO.open();
+                answers = answerDAO.getAnswersByCID(currentCandidate.getId());
+                answerDAO.close();
+                return answers;
+            }
+
+            @Override
+            protected void onPostExecute(List<Answer> answers) {
+                super.onPostExecute(answers);
+                answerList = answers;
+                adapter = new ResultAdapter(getActivity(),multiChoiceQuestions, constructedQuestions, currentCandidate,answerList);
+                lvResult.setAdapter(adapter);
+                lvResult.addFooterView(footer());
+                txtSum.setText(String.valueOf(getSum(answers)));
+            }
+        };
+        getAnswerAsyncTask.execute();
+    }
+
 
     private float getSum(List<Answer> answers)
     {
@@ -141,37 +150,41 @@ public class ResultFragment extends Fragment {
         btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateAsyncTask.execute();
+                updatePoint();
             }
         });
         return v;
     }
 
-    AsyncTask<Void, Void, Boolean> updateAsyncTask = new AsyncTask<Void, Void, Boolean>() {
-        boolean isUpdated = false;
-        @Override
-        protected Boolean doInBackground(Void... voids) {
+    private void updatePoint()
+    {
+        AsyncTask<Void, Void, Boolean> updateAsyncTask = new AsyncTask<Void, Void, Boolean>() {
+            boolean isUpdated = false;
+            @Override
+            protected Boolean doInBackground(Void... voids) {
 
-            AnswerDAO answerDAO = AnswerDAO.getInstance(getActivity());
-            answerDAO.open();
-            for (int i =answerList.size()-1; i >= answerList.size()-adapter.getConstructedCount();i-- )
-            {
-                isUpdated =   answerDAO.updateAnswer(answerList.get(i).getAnswerId(), answerList.get(i).getPoint());
-                Log.d("candidate async point", " id:  "  + answerList.get(i).getAnswerId() + " point " +  answerList.get(i).getPoint() );
-                Log.d("candidate async point", " is update " +  isUpdated );
+                AnswerDAO answerDAO = AnswerDAO.getInstance(getActivity());
+                answerDAO.open();
+                for (int i =answerList.size()-1; i >= answerList.size()-adapter.getConstructedCount();i-- )
+                {
+                    isUpdated =   answerDAO.updateAnswer(answerList.get(i).getAnswerId(), answerList.get(i).getPoint());
+                    Log.d("candidate async point", " id:  "  + answerList.get(i).getAnswerId() + " point " +  answerList.get(i).getPoint() );
+                    Log.d("candidate async point", " is update " +  isUpdated );
+                }
+                answerDAO.close();
+                return isUpdated;
             }
-            answerDAO.close();
-            return isUpdated;
-        }
 
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if(isUpdated)
-            {
-                txtSum.setText(String.valueOf(getSum(answerList)));
-                Log.d("candidate result", String.valueOf(isUpdated));
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                if(isUpdated)
+                {
+                    txtSum.setText(String.valueOf(getSum(answerList)));
+                    Log.d("candidate result", String.valueOf(isUpdated));
+                }
             }
-        }
-    };
+        };
+        updateAsyncTask.execute();
+    }
 }

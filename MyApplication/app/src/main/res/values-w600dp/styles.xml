@@ -1,11 +1,4 @@
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="BaseTheme">
-        <!-- Customize your theme here. -->
-    </style>
-    <style name="BaseTheme" parent="Base.Theme.AppCompat.Light"></style>
-
     <style name="Text_Title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -20,8 +13,6 @@
 
     <style name="tv_large">
         <item name="android:textColor">@android:color/holo_blue_light</item>
-        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
     </style>
-
-
 </resources>

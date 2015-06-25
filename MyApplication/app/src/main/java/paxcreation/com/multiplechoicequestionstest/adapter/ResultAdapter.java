@@ -74,7 +74,7 @@ public class ResultAdapter extends BaseAdapter {
 //        inflater = (LayoutInflater) ((Activity)context).getLayoutInflater();
         final Answer currentAnswer = answers.get(position);
         Log.d("candidate answer count", "answer count " + answers.size());
-        final View view = inflater.inflate(R.layout.question_element, null);
+        View view = inflater.inflate(R.layout.question_element, null);
         TextView txtQuestion = (TextView) view.findViewById(R.id.txtQuestion_MultiChoiceElement);
         TextView txtContent = (TextView) view.findViewById(R.id.txtContent_MultiChoiceElement);
         ((EditText) view.findViewById(R.id.edAnswerConstructed_MultiChoiceElement)).setVisibility(View.GONE);
@@ -89,13 +89,12 @@ public class ResultAdapter extends BaseAdapter {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Log.d("candidate point update",String.valueOf(charSequence.charAt(i)));
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                currentAnswer.setPoint(Float.parseFloat(editable.toString()));
-
+                if(!editable.toString().equals("") || !(editable.toString().length() ==0))
+                    currentAnswer.setPoint(Float.parseFloat(editable.toString()));
             }
         });
 
@@ -114,7 +113,7 @@ public class ResultAdapter extends BaseAdapter {
             ConstructedQuestion currentConstructed = constructedQuestions.get(position-getMultiChoiceCount());
             txtQuestion.setText(currentConstructed.getQuestion());
             txtContent.setText(currentConstructed.getContent());
-            txtResult.setText(currentAnswer.getConstructedAnswer());
+            txtResult.setText(currentAnswer.getConstructedAnswer().trim());
             edPoint.setText(String.valueOf(currentAnswer.getPoint()));
         }
         return view;

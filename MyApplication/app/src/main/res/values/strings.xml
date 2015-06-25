@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MultipleChoiceQuestionsTest</string>
+    <string name="app_name">Test</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -20,9 +20,11 @@
     <string name="result">Result</string>
     <string name="writing_point">Writing Point:</string>
     <string name="dev">Candidate</string>
-    <string name="android">Android:</string>
-    <string name="ios">IOS:</string>
+    <string name="android">Android</string>
+    <string name="ios">IOS</string>
     <string name="finish">Finish</string>
+    <string name="position">Position</string>
+    <string name="role">Role</string>
     <string name="lorum">"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."</string>
 
 

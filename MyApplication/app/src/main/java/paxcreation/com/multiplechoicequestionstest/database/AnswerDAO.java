@@ -63,7 +63,6 @@ public class AnswerDAO {
 
     public boolean insertAnswer(long candidateId, int questionId, int multiChoiceAnswer, String constructedAnswer, float point)
     {
-        open();
         ContentValues values = new ContentValues();
         values.put(DBHelper.ANSWER_C_ID, candidateId);
         values.put(DBHelper.ANSWER_Q_ID, questionId);
@@ -71,24 +70,21 @@ public class AnswerDAO {
         values.put(DBHelper.ANSWER_CONSTRUCTED_ANSWER, constructedAnswer);
         values.put(DBHelper.ANSWER_POINT, point);
         long insertId = database.insert(DBHelper.TABLE_ANSWER, null, values);
-        close();
         return (insertId >=0)? true: false;
     }
 
     public boolean updateAnswer(long answerId,float point)
     {
-        open();
         ContentValues values = new ContentValues();
         values.put(DBHelper.ANSWER_POINT, point);
         int rowEffected =database.update(DBHelper.TABLE_ANSWER, values, DBHelper.ANSWER_ID + " = " + answerId, null);
-        close();
         return (rowEffected>0)? true : false;
     }
+
 
     public List<Answer>  getAnswersByCID(long candidateId)
     {
         List<Answer> answers = new ArrayList<Answer>();
-        open();
         Cursor cursor = database.query(DBHelper.TABLE_ANSWER, allColumns, DBHelper.ANSWER_C_ID + " = "+ candidateId, null,null,null,null);
         if(cursor!=null)
         {
@@ -100,8 +96,16 @@ public class AnswerDAO {
             }
         }
         cursor.close();
-        close();
         return answers;
+
+    }
+
+    public int deleteAnswerByCandidate(long candidateId)
+    {
+        open();
+        int rowEffect = database.delete(DBHelper.TABLE_ANSWER, DBHelper.ANSWER_C_ID + " = " + candidateId, null);
+        close();
+        return rowEffect;
 
     }
 

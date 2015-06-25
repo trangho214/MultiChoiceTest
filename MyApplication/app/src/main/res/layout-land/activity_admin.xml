@@ -12,6 +12,10 @@
         tools:layout="@layout/fragment_candidate_list"
         android:layout_weight="1">
     </fragment>
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"></View>
     <FrameLayout
         android:id="@+id/frResult"
         android:layout_width="0dp"

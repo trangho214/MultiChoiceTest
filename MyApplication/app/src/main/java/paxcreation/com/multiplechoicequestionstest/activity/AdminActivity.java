@@ -1,7 +1,9 @@
 package paxcreation.com.multiplechoicequestionstest.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.View;
 
 import paxcreation.com.multiplechoicequestionstest.R;
 
@@ -13,5 +15,16 @@ public class AdminActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

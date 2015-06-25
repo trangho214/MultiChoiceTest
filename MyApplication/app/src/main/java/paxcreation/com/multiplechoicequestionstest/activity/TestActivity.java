@@ -25,7 +25,9 @@ import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
 import paxcreation.com.multiplechoicequestionstest.entity.ConstructedQuestion;
 import paxcreation.com.multiplechoicequestionstest.entity.MultiChoiceQuestion;
 import paxcreation.com.multiplechoicequestionstest.global.GlobalObject;
+import paxcreation.com.multiplechoicequestionstest.interfaces.IDialog;
 import paxcreation.com.multiplechoicequestionstest.utils.Data;
+import paxcreation.com.multiplechoicequestionstest.utils.Util;
 
 /**
  * Created by Administrator on 16/06/2015.
@@ -40,6 +42,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
     private  List<Answer> answers;
     private int currentPosition=0;
     private boolean isDone = false;
+    private boolean isTimeUp = false;
     private int time;
 
 
@@ -81,7 +84,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
         vp.setOnPageChangeListener(onPageChangeListener);
         candidate.setAnswers(answers);
 
-        startCountdown((int) (0.3*60*1000));
+        startCountdown(time);
     }
 
     private void startCountdown(int timeInMilliseconds)
@@ -94,8 +97,11 @@ public class TestActivity extends Activity implements ViewPagerListener{
             }
             @Override
             public void onFinish() {
-
-                asyncTask.execute(candidate);
+                if (!isDone)
+                {
+                    isTimeUp = true;
+                    saveAnswers();
+                }
             }
         }).start();
     }
@@ -115,6 +121,11 @@ public class TestActivity extends Activity implements ViewPagerListener{
         public void onPageScrollStateChanged(int state) {
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        return;
+    }
 
     //    Click next or previous
     public void onClick(View v)
@@ -136,80 +147,82 @@ public class TestActivity extends Activity implements ViewPagerListener{
                 }
                 break;
             case R.id.btnFinish:
-                showConfirmationDialog();
+                Util.showConfirmationDialog(this,
+                        "Confirmation",
+                        "This action will terminate your test. Are you sure?",
+                        true,
+                        "Yes",
+                        "No",
+                        new IDialog() {
+                            @Override
+                            public void dimissDialog(boolean isPositive) {
+                                if(isPositive)
+                                    saveAnswers();
+                                else return;
+                            }
+                        });
                 break;
         }
     }
 
 
-    AsyncTask<Candidate, Void, Void > asyncTask = new AsyncTask<Candidate, Void, Void>() {
-        AnswerDAO answerDAO;
-        @Override
-        protected Void doInBackground(Candidate... params) {
-            try{
-                answerDAO = AnswerDAO.getInstance(TestActivity.this.getApplicationContext());
-                answerDAO.open();
-                for (int i = 0; i<candidate.getAnswers().size(); i++)
-                {
-                    Answer answer = candidate.getAnswers().get(i);
-                    Log.d("candidate answer", answer.getConstructedAnswer());
-                    answerDAO.insertAnswer(candidate.getId(), answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer(), answer.getPoint());
-                }
-                answerDAO.close();
-                return null;
-            }
-            catch (Exception e)
-            {
-                answerDAO.close();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aBoolean) {
-            if(isDone)
-                showThankDialog("Thank You", "Thank for participating in our test.\n Your answers are saved.", "OK");
-            else
-                showThankDialog("Time's up", "Thank for participating in our test.\n Your answers are saved.", "OK");
-        }
-    };
-
-
-    private void showConfirmationDialog(){
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Confirmation");
-        alertDialog.setMessage("This action will terminate your test. Are you sure?");
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                isDone = true;
-                asyncTask.execute(candidate);
-            }
-        });
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        alertDialog.show();
-    }
-
-
-    private void showThankDialog(String title, String message, String positiveConfirm)
+    private void saveAnswers()
     {
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, positiveConfirm, new DialogInterface.OnClickListener() {
+        AsyncTask<Candidate, Void, Void > asyncTask = new AsyncTask<Candidate, Void, Void>() {
+            AnswerDAO answerDAO;
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(TestActivity.this, MainActivity.class);
-                startActivity(intent);
+            protected Void doInBackground(Candidate... params) {
+                try{
+                    answerDAO = AnswerDAO.getInstance(TestActivity.this.getApplicationContext());
+                    answerDAO.open();
+                    for (int i = 0; i<candidate.getAnswers().size(); i++)
+                    {
+                        Answer answer = candidate.getAnswers().get(i);
+                        Log.d("candidate answer", answer.getConstructedAnswer());
+                        answerDAO.insertAnswer(candidate.getId(), answer.getQuestionId(), answer.getMultiChoiceAnswer(), answer.getConstructedAnswer(), answer.getPoint());
+                    }
+                    answerDAO.close();
+                    isDone = true;
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    answerDAO.close();
+                    return null;
+                }
             }
-        });
-        alertDialog.show();
+
+            @Override
+            protected void onPostExecute(Void aBoolean) {
+                if(isDone && !isTimeUp)
+                    showThankYouDialog("Thank You");
+                else
+                    showThankYouDialog("Time's up");
+            }
+        };
+        if(!isDone)
+        {
+            asyncTask.execute();
+        }
     }
+
+
+    private  void showThankYouDialog(String title){
+        Util.showConfirmationDialog(this,
+                title,
+                "Thank for participating in our test.\n Your answers are saved.",
+                false,
+                "OK",
+                "", new IDialog() {
+                    @Override
+                    public void dimissDialog(boolean isPositive) {
+                        Intent intent = new Intent(TestActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+    }
+
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

@@ -1,6 +1,7 @@
 package paxcreation.com.multiplechoicequestionstest.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,14 +20,25 @@ import paxcreation.com.multiplechoicequestionstest.entity.Candidate;
  * Created by Administrator on 18/06/2015.
  */
 public class CandidateAdapter extends BaseAdapter {
+    private static View previousView;
     Context context;
     List<Candidate> candidates;
-    LayoutInflater inflater;
+//    LayoutInflater inflater;
     public CandidateAdapter(Context context, List<Candidate> candidates){
         this.context = context;
         this.candidates = candidates;
-        inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
+
+    public void clearData()
+    {
+        candidates.clear();
+    }
+
+    public void addData(List<Candidate> candidates)
+    {
+        this.candidates = candidates;
+    }
+
     @Override
     public int getCount() {
         return candidates.size();
@@ -49,6 +61,7 @@ public class CandidateAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View rowView = convertView;
+        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Candidate currentCandidate = getItem(position);
         if(rowView == null)
         {
@@ -60,6 +73,7 @@ public class CandidateAdapter extends BaseAdapter {
         }
 
         ViewHolder vh =(ViewHolder)rowView.getTag();
+
         vh.txtName.setText(currentCandidate.getName());
         Log.d("candidate name", currentCandidate.getName());
         vh.txtCreatedAt.setText(millisecondsToDateTime(currentCandidate.getCreate_at()));
