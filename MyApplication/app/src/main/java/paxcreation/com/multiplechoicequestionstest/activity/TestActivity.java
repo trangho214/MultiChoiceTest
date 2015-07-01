@@ -44,6 +44,7 @@ public class TestActivity extends Activity implements ViewPagerListener{
     private boolean isDone = false;
     private boolean isTimeUp = false;
     private int time;
+    private boolean isIntern;
 
 
     private List<MultiChoiceQuestion> multiChoiceQuestions;
@@ -52,6 +53,8 @@ public class TestActivity extends Activity implements ViewPagerListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.test);
+        String role = getIntent().getExtras().getString("position");
+        isIntern = role.equals(getString(R.string.intern));
         init();
     }
 
@@ -63,16 +66,24 @@ public class TestActivity extends Activity implements ViewPagerListener{
         multiChoiceQuestions = new ArrayList<MultiChoiceQuestion>();
         constructedQuestions = new ArrayList<ConstructedQuestion>();
         vp = (ViewPager)findViewById(R.id.vpQuestion_Test);
-        if(candidate.isAndroidDev()){
+        if(candidate.isAndroidDev() && !isIntern){
             multiChoiceQuestions = Data.getMultiChoiceQuestionsAndroid();
             constructedQuestions = Data.getConstructedQuestionAndroid();
             time = 20*60*1000;
         }
         else {
-            multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
-            constructedQuestions = Data.getConstructedQuestionIOS();
-            time = 10*60*1000;
+            if(candidate.isAndroidDev() && isIntern){
+                multiChoiceQuestions = Data.getMultiChoiceQuestionsAndroid();
+                constructedQuestions = new ArrayList<ConstructedQuestion>(); // Data.getConstructedQuestionAndroid();
+                time = 20*60*1000;
+            }
+            else {
+                multiChoiceQuestions = Data.getMultiChoiceQuestionIOS();
+                constructedQuestions = Data.getConstructedQuestionIOS();
+                time = 10*60*1000;
+            }
         }
+
         adapter = new MultiChoiceAdapter(this,multiChoiceQuestions, constructedQuestions, this);
 
         for(int i =0; i<adapter.getCount(); i++)

@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             position = spRoleMain.getSelectedItem().toString();
             candidate.setIsAndroidDev(isAndroidDev);
             if ( v == btnOkMain ) {
-                if (position.equals(getString(R.string.dev)))
+                if (position.equals(getString(R.string.dev)) || position.equals(getString(R.string.intern)))
                 {
                     if(name.toLowerCase().equals("admin"))
                     {
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     {
                         addNewCandidate();
                         Intent intent = new Intent(MainActivity.this, StartActivity.class);
+                        intent.putExtra("position", position);
                         startActivity(intent);
                     }
                 }
@@ -117,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
 
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
