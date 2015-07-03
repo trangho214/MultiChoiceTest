@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,11 +59,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         spSubjectMain = (Spinner)findViewById( R.id.spSubject_Main );
         spRoleMain = (Spinner)findViewById( R.id.spRole_Main );
+        spRoleMain.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position==0)
+                {
+                    spSubjectMain.setSelection(0);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
         btnOkMain = (Button)findViewById( R.id.btnOk_Main );
         candidate = GlobalObject.getCandidateInstance_Test();
 
         subjectAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.subjects));
         spSubjectMain.setAdapter(subjectAdapter);
+        spSubjectMain.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position ==1)
+                {
+                    if(spRoleMain.getSelectedItemPosition()==0)
+                    {
+                        spRoleMain.setSelection(1);
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         roleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, getResources().getStringArray(R.array.role));
         spRoleMain.setAdapter(roleAdapter);
@@ -129,22 +164,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (name.equals("")|| name.length()==0);
     }
 
-       private void addNewCandidate (){
+    private void addNewCandidate (){
         AsyncTask<Candidate, Void, Boolean> asyncTask = new AsyncTask<Candidate, Void, Boolean>() {
-        @Override
-        protected Boolean doInBackground(Candidate... params) {
-            CandidateDAO candidateDAO = CandidateDAO.getInstance(MainActivity.this.getApplicationContext());
-            candidateDAO.open();
-            long id = candidateDAO.insertCandidate(candidate.getName(), candidate.isAndroidDev(), System.currentTimeMillis());
-            if(id != -1) {
-                candidate.setId(id);
+            @Override
+            protected Boolean doInBackground(Candidate... params) {
+                CandidateDAO candidateDAO = CandidateDAO.getInstance(MainActivity.this.getApplicationContext());
+                candidateDAO.open();
+                long id = candidateDAO.insertCandidate(candidate.getName(), candidate.isAndroidDev(), System.currentTimeMillis());
+                if(id != -1) {
+                    candidate.setId(id);
+                    candidateDAO.close();
+                    return true;
+                }
                 candidateDAO.close();
-                return true;
+                return false;
             }
-            candidateDAO.close();
-            return false;
-        }
-    };
+        };
         asyncTask.execute();
     }
 }
